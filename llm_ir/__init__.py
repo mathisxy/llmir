@@ -1,3 +1,3 @@
-from .chunks import AIChunkText, AIChunkFile
+from .chunks import AIChunk, AIChunkText, AIChunkFile
 from .roles import AIRoles
 from .messages import AIMessage
