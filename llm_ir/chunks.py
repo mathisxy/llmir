@@ -1,5 +1,4 @@
 from typing import Union, Literal
-
 from pydantic import BaseModel
 
 class AIChunkText(BaseModel):
@@ -12,4 +11,8 @@ class AIChunkFile(BaseModel):
     mimetype: str
     content: bytes
 
-AIChunk = Union[AIChunkText, AIChunkFile]
+class AIChunkImageURL(BaseModel):
+    type: Literal["image"] = "image"
+    url: str
+
+AIChunk = Union[AIChunkText, AIChunkFile, AIChunkImageURL]
