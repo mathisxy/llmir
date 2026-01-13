@@ -1,6 +1,6 @@
 [project]
 name = "llm-ir"
-version = "0.0.7"
+version = "0.0.10"
 description = "Core message IR for LLM pipelines"
 authors = [{ name="Mathis Siebert" }]
 requires-python = ">=3.11"
@@ -11,4 +11,10 @@ dependencies = [
 [build-system]
 requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = [
+  "llm_ir",
+  "llm_ir.adapter",
+]
 
