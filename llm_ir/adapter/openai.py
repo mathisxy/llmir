@@ -1,6 +1,6 @@
 from typing import TypedDict, Literal, Union
 
-from ..messages import AIMessage
+from ..messages import AIMessage, AIMessageToolResponse
 from ..chunks import AIChunk, AIChunkText, AIChunkImageURL, AIChunkFile
 import base64
 
@@ -21,6 +21,10 @@ class OpenAIMessage(TypedDict):
     role: str
     content: list[OpenAIContent]
 
+class OpenAIMessageToolResponse(OpenAIMessage):
+    tool_call_id: str
+    name: str
+
 
 def to_openai(messages: list[AIMessage]) -> list[OpenAIMessage]:
     
@@ -28,12 +32,24 @@ def to_openai(messages: list[AIMessage]) -> list[OpenAIMessage]:
     result: list[OpenAIMessage] = []
     for message in messages:
         role = message.role.value
-        result.append(OpenAIMessage(
-            role= role,
-            content= [
-                chunk_to_openai(chunk) for chunk in message.chunks
-            ]
-        ))
+        if isinstance(message, AIMessageToolResponse):
+            result.append(
+                OpenAIMessageToolResponse(
+                    role=role,
+                    tool_call_id=message.id,
+                    name=message.name,
+                    content=[
+                        chunk_to_openai(chunk) for chunk in message.chunks
+                    ]
+                )
+            )
+        else:
+            result.append(OpenAIMessage(
+                role= role,
+                content= [
+                    chunk_to_openai(chunk) for chunk in message.chunks
+                ]
+            ))
     return result
 
 
