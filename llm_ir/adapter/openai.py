@@ -61,6 +61,12 @@ def chunk_to_openai(chunk: AIChunk) -> OpenAIContent:
                         "url": f"data:{chunk.mimetype};base64,{base64_data}",
                     }
                 )
+            elif chunk.mimetype == ("text/plain"):
+                text = chunk.bytes.decode(encoding="utf-8")
+                return OpenAITextContent(
+                    type="text",
+                    text=text
+                )
             else:
                 raise ValueError(f"Unsupported file type for OpenAI: {chunk.mimetype}")
         case _:
