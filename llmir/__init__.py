@@ -1,6 +1,6 @@
 from .chunks import AIChunk, AIChunkText, AIChunkFile, AIChunkImageURL, AIChunkToolCall
 from .roles import AIRoles
-from .messages import AIMessage, AIMessageToolResponse
+from .messages import AIMessages, AIMessage, AIMessageToolResponse
 from .tools import Tool
 
 __all__ = [
@@ -10,6 +10,7 @@ __all__ = [
     "AIChunkImageURL",
     "AIChunkToolCall",
     "AIRoles",
+    "AIMessages",
     "AIMessage",
     "AIMessageToolResponse",
 

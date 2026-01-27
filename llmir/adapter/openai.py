@@ -1,6 +1,6 @@
 from typing import TypedDict, Literal, Union
 
-from ..messages import AIMessage, AIMessageToolResponse
+from ..messages import AIMessages, AIMessageToolResponse
 from ..chunks import AIChunk, AIChunkText, AIChunkImageURL, AIChunkFile
 import base64
 
@@ -26,7 +26,7 @@ class OpenAIMessageToolResponse(OpenAIMessage):
     name: str
 
 
-def to_openai(messages: list[AIMessage]) -> list[OpenAIMessage]:
+def to_openai(messages: list[AIMessages]) -> list[OpenAIMessage]:
     
 
     result: list[OpenAIMessage] = []
