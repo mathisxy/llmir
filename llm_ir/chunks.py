@@ -22,4 +22,4 @@ class AIChunkToolCall(BaseModel):
     arguments: dict[str, object]
 
 
-AIChunk = Union[AIChunkText, AIChunkFile, AIChunkImageURL]
+AIChunk = Union[AIChunkText, AIChunkFile, AIChunkImageURL, AIChunkToolCall]
