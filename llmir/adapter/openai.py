@@ -1,20 +1,35 @@
 from typing import TypedDict, Literal, Union
 
 from ..messages import AIMessages, AIMessageToolResponse
-from ..chunks import AIChunk, AIChunkText, AIChunkImageURL, AIChunkFile
+from ..chunks import AIChunk, AIChunkText, AIChunkImageURL, AIChunkFile, AIChunkToolCall
 import base64
+import json
 
 
 class OpenAITextContent(TypedDict):
     type: Literal["text"]
     text: str
 
+class OpenAIImageURLURL(TypedDict):
+    url: str
 
 class OpenAIImageURLContent(TypedDict):
     type: Literal["image_url"]
-    image_url: dict[str, str]
+    image_url: OpenAIImageURLURL
 
-OpenAIContent = Union[OpenAITextContent, OpenAIImageURLContent]
+
+class OpenAIToolCallFunction(TypedDict):
+    name: str
+    arguments: str
+
+class OpenAIToolCallContent(TypedDict):
+    id: str
+    type: Literal["function"]
+    function: OpenAIToolCallFunction
+
+    
+
+OpenAIContent = Union[OpenAITextContent, OpenAIImageURLContent, OpenAIToolCallContent]
 
 
 class OpenAIMessage(TypedDict):
@@ -77,7 +92,7 @@ def chunk_to_openai(chunk: AIChunk) -> OpenAIContent:
                         "url": f"data:{chunk.mimetype};base64,{base64_data}",
                     }
                 )
-            elif chunk.mimetype == ("text/plain"):
+            elif chunk.mimetype == "text/plain":
                 text = chunk.bytes.decode(encoding="utf-8")
                 return OpenAITextContent(
                     type="text",
@@ -85,5 +100,14 @@ def chunk_to_openai(chunk: AIChunk) -> OpenAIContent:
                 )
             else:
                 raise ValueError(f"Unsupported file type for OpenAI: {chunk.mimetype}")
+        case AIChunkToolCall():
+            return OpenAIToolCallContent(
+                id=chunk.id,
+                type="function",
+                function=OpenAIToolCallFunction(
+                    name=chunk.name,
+                    arguments=json.dumps(chunk.arguments)
+                )
+            )
         case _:
             raise ValueError(f"Unsupported chunk type: {type(chunk)}")
