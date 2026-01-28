@@ -1,19 +1,19 @@
-from typing import TypedDict, Literal, Union
+from typing import TypedDict, Literal
 
 from ..messages import AIMessages, AIMessageToolResponse
-from ..chunks import AIChunk, AIChunkText, AIChunkImageURL, AIChunkFile, AIChunkToolCall
+from ..chunks import AIChunkText, AIChunkImageURL, AIChunkFile, AIChunkToolCall
 import base64
 import json
 
 
-class OpenAITextContent(TypedDict):
+class OpenAIText(TypedDict):
     type: Literal["text"]
     text: str
 
 class OpenAIImageURLURL(TypedDict):
     url: str
 
-class OpenAIImageURLContent(TypedDict):
+class OpenAIImageURL(TypedDict):
     type: Literal["image_url"]
     image_url: OpenAIImageURLURL
 
@@ -22,62 +22,88 @@ class OpenAIToolCallFunction(TypedDict):
     name: str
     arguments: str
 
-class OpenAIToolCallContent(TypedDict):
+class OpenAIToolCall(TypedDict):
     id: str
     type: Literal["function"]
     function: OpenAIToolCallFunction
 
     
 
-OpenAIContent = Union[OpenAITextContent, OpenAIImageURLContent, OpenAIToolCallContent]
+OpenAIContents = OpenAIText | OpenAIImageURL
 
 
 class OpenAIMessage(TypedDict):
     role: str
-    content: list[OpenAIContent]
+    content: list[OpenAIContents]
+    tool_calls: list[OpenAIToolCall]
 
-class OpenAIMessageToolResponse(OpenAIMessage):
+class OpenAIMessageToolResponse(TypedDict):
+    role: Literal["tool"]
     tool_call_id: str
-    name: str
+    content: str
 
 
-def to_openai(messages: list[AIMessages]) -> list[OpenAIMessage]:
+OpenAIMessages = OpenAIMessage | OpenAIMessageToolResponse
+
+
+
+def to_openai(messages: list[AIMessages]) -> list[OpenAIMessages]:
     
 
-    result: list[OpenAIMessage] = []
+    result: list[OpenAIMessages] = []
     for message in messages:
         role = message.role.value
         if isinstance(message, AIMessageToolResponse):
+            assert(role == "tool")
+            text: str = ""
+            media_chunks: list[AIChunkFile | AIChunkImageURL] = []
+            for chunk in message.chunks:
+                if isinstance(chunk, AIChunkText):
+                    text += chunk.text
+                elif isinstance(chunk, AIChunkImageURL) or isinstance(chunk, AIChunkFile):
+                    media_chunks.append(chunk)
+                else:
+                    raise Exception(f"Invalid chunk type for Tool Response: {chunk.type}")
             result.append(
                 OpenAIMessageToolResponse(
                     role=role,
                     tool_call_id=message.id,
-                    name=message.name,
-                    content=[
-                        chunk_to_openai(chunk) for chunk in message.chunks
-                    ]
+                    content=text,
                 )
             )
+            if media_chunks:
+                result.append(
+                    OpenAIMessage(
+                        role="user", # Hacky, but what else to circumvent API limitations in a broadly compatible way?
+                        content=[
+                            content_chunk_to_openai(chunk) for chunk in media_chunks
+                        ],
+                        tool_calls=[]
+                    )
+                )
         else:
             result.append(OpenAIMessage(
                 role= role,
-                content= [
-                    chunk_to_openai(chunk) for chunk in message.chunks
+                content=[
+                    content_chunk_to_openai(chunk) for chunk in message.chunks if not isinstance(chunk, AIChunkToolCall)
+                ],
+                tool_calls=[
+                    tool_call_chunk_to_openai(chunk) for chunk in message.chunks if isinstance(chunk, AIChunkToolCall)
                 ]
             ))
     return result
 
 
-def chunk_to_openai(chunk: AIChunk) -> OpenAIContent:
+def content_chunk_to_openai(chunk: AIChunkText | AIChunkFile | AIChunkImageURL) -> OpenAIContents:
 
     match chunk:
         case AIChunkText():
-            return OpenAITextContent(
+            return OpenAIText(
                 type="text",
                 text=chunk.text,
             )
         case AIChunkImageURL():
-            return OpenAIImageURLContent(
+            return OpenAIImageURL(
                 type="image_url",
                 image_url={
                     "url": chunk.url,
@@ -86,7 +112,7 @@ def chunk_to_openai(chunk: AIChunk) -> OpenAIContent:
         case AIChunkFile():
             if chunk.mimetype.startswith("image/"):
                 base64_data = base64.b64encode(chunk.bytes).decode('utf-8')
-                return OpenAIImageURLContent(
+                return OpenAIImageURL(
                     type= "image_url",
                     image_url= {
                         "url": f"data:{chunk.mimetype};base64,{base64_data}",
@@ -94,14 +120,18 @@ def chunk_to_openai(chunk: AIChunk) -> OpenAIContent:
                 )
             elif chunk.mimetype == "text/plain":
                 text = chunk.bytes.decode(encoding="utf-8")
-                return OpenAITextContent(
+                return OpenAIText(
                     type="text",
                     text=text
                 )
             else:
                 raise ValueError(f"Unsupported file type for OpenAI: {chunk.mimetype}")
-        case AIChunkToolCall():
-            return OpenAIToolCallContent(
+        case _:
+            raise ValueError(f"Unsupported chunk type: {type(chunk)}")
+        
+def tool_call_chunk_to_openai(chunk: AIChunkToolCall) -> OpenAIToolCall:
+
+    return OpenAIToolCall(
                 id=chunk.id,
                 type="function",
                 function=OpenAIToolCallFunction(
@@ -109,5 +139,3 @@ def chunk_to_openai(chunk: AIChunk) -> OpenAIContent:
                     arguments=json.dumps(chunk.arguments)
                 )
             )
-        case _:
-            raise ValueError(f"Unsupported chunk type: {type(chunk)}")

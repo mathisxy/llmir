@@ -1,13 +1,14 @@
-from .openai import to_openai, OpenAIMessage, OpenAIMessageToolResponse, OpenAIContent, OpenAITextContent, OpenAIImageURLContent, OpenAIImageURLURL, OpenAIToolCallContent, OpenAIToolCallFunction
+from .openai import to_openai, OpenAIMessages, OpenAIMessage, OpenAIMessageToolResponse, OpenAIContents, OpenAIText, OpenAIImageURL, OpenAIImageURLURL, OpenAIToolCall, OpenAIToolCallFunction
 
 __all__ = [
     "to_openai",
+    "OpenAIMessages",
     "OpenAIMessage",
     "OpenAIMessageToolResponse",
-    "OpenAIContent",
-    "OpenAITextContent",
-    "OpenAIImageURLContent",
+    "OpenAIContents",
+    "OpenAIText",
+    "OpenAIImageURL",
     "OpenAIImageURLURL",
-    "OpenAIToolCallContent",
+    "OpenAIToolCall",
     "OpenAIToolCallFunction",
 ]

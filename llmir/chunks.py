@@ -23,4 +23,4 @@ class AIChunkToolCall(RichReprMixin, BaseModel):
     arguments: dict[str, object]
 
 
-AIChunk = Union[AIChunkText, AIChunkFile, AIChunkImageURL, AIChunkToolCall]
+AIChunks = Union[AIChunkText, AIChunkFile, AIChunkImageURL, AIChunkToolCall]
