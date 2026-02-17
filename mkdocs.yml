@@ -1,0 +1,15 @@
+site_name: LLM Intermediate Representation
+repo_url: https://github.com/mathisxy/llmir
+repo_name: mathisxy/llmir
+
+theme:
+  name: material
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            members_order: source
+  - awesome-pages

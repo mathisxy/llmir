@@ -1,0 +1,6 @@
+nav:
+    - Messages: messages.md
+    - Roles: roles.md
+    - Chunks: chunks.md
+    - Tools: tools.md
+    - Repr. Mixin: rich.md
