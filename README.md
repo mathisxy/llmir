@@ -12,7 +12,7 @@ This repository provides the core types for a standardized way to represent mess
 ## Installation via Pypi:
 
 ```bash
-pip install llm-ir
+pip install llmir
 ```
 
 ## Imports:
