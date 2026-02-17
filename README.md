@@ -10,5 +10,5 @@ pip install llm-ir
 ## Imports:
 
 ```python
-from llm_ir import AIMessage, AIRoles, AIChunk, AIChunkText, AIChunkFile
+from llm_ir import AIMessage, AIRoles, AIChunks, AIChunkText, AIChunkFile, AIChunkImageURL
 ```
