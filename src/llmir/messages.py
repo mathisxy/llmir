@@ -1,6 +1,7 @@
+from __future__ import annotations
 from pydantic import BaseModel, Field
 from typing import Literal
-from .chunks import AIChunks
+from .chunks import AIChunks, AIChunkText
 from .roles import AIRoles
 
 class AIMessage(BaseModel):
@@ -14,6 +15,19 @@ class AIMessage(BaseModel):
 
     role: Literal[AIRoles.USER, AIRoles.MODEL, AIRoles.SYSTEM]
     chunks: list[AIChunks] = Field(default_factory=list[AIChunks])
+
+    @classmethod
+    def text(cls,
+        text: str,
+        role: Literal[AIRoles.USER, AIRoles.MODEL, AIRoles.SYSTEM],
+    ) -> AIMessage:
+        return AIMessage(
+            role=role,
+            chunks=[
+                AIChunkText(text=text)
+            ]
+        )
+        
 
 class AIMessageToolResponse(BaseModel):
     """
