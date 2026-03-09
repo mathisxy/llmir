@@ -8,7 +8,7 @@ classifiers = [
 ]
 
 name = "llmir"
-version = "0.0.16"
+dynamic = ["version"]
 description = "Core message and tool IR for LLM pipelines"
 authors = [{ name="Mathis Siebert" }]
 readme = "README.md"
