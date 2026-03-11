@@ -1,4 +1,4 @@
-from typing import Union, Literal
+from typing import Union, Literal, Any, Mapping
 from pydantic import BaseModel
 from .rich import RichReprMixin
 
@@ -62,7 +62,7 @@ class AIChunkToolCall(RichReprMixin, BaseModel):
     type: Literal["tool_call"] = "tool_call"
     id: str
     name: str
-    arguments: dict[str, object]
+    arguments: Mapping[str, Any]
 
 
 AIChunks = Union[AIChunkText, AIChunkFile, AIChunkImageURL, AIChunkToolCall]

@@ -1,14 +1,7 @@
-from .openai import to_openai, OpenAIMessages, OpenAIMessage, OpenAIMessageToolResponse, OpenAIContents, OpenAIText, OpenAIImageURL, OpenAIImageURLURL, OpenAIToolCall, OpenAIToolCallFunction
+from .openai import OpenAIAdapter
+from .ollama import OllamaAdapter
 
 __all__ = [
-    "to_openai",
-    "OpenAIMessages",
-    "OpenAIMessage",
-    "OpenAIMessageToolResponse",
-    "OpenAIContents",
-    "OpenAIText",
-    "OpenAIImageURL",
-    "OpenAIImageURLURL",
-    "OpenAIToolCall",
-    "OpenAIToolCallFunction",
+    "OpenAIAdapter",
+    "OllamaAdapter",
 ]

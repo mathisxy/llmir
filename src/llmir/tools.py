@@ -1,7 +1,7 @@
 from pydantic import BaseModel
-from typing import Any
+from typing import Any, Mapping
 
-class Tool(BaseModel):
+class AITool(BaseModel):
     """
     A tool that can be used by the LLM.
 
@@ -13,5 +13,5 @@ class Tool(BaseModel):
 
     name: str
     description: str
-    input_schema: dict[str, Any]
+    input_schema: Mapping[str, Any]
 
