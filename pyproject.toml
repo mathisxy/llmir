@@ -25,7 +25,10 @@ dependencies = [
 dev = [
   "pyright",
   "pytest",
-  "coverage"
+  "coverage",
+
+  "ollama",
+  "openai",
 ]
 docs = [
     "mkdocs",
