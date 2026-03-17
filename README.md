@@ -18,5 +18,5 @@ pip install llmir
 ## Imports:
 
 ```python
-from llm_ir import AIMessages, AIMessage, AIMessageToolResponse, AIRoles, AIChunks, AIChunkText, AIChunkFile, AIChunkImageURL
+from llmir import AIMessages, AIMessage, AIMessageToolResponse, AIRoles, AIChunks, AIChunkText, AIChunkFile, AIChunkImageURL, AIChunkToolCall, AITool
 ```
