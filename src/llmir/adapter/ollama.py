@@ -7,7 +7,7 @@ from ollama import (
 from ..messages import AIMessages, AIMessageToolResponse
 from ..chunks import AIChunkText, AIChunkFile, AIChunkImageURL, AIChunkToolCall, AIChunks
 from ..tools import AITool
-from .base import BaseAdapter
+from .base import BaseAdapter, UnsupportedChunk
 
 
 class OllamaAdapter(BaseAdapter):
@@ -36,6 +36,9 @@ class OllamaAdapter(BaseAdapter):
                     elif chunk.mimetype == "text/plain":
                         text += chunk.bytes.decode("utf-8") + "\n"
 
+                    else:
+                        raise UnsupportedChunk(chunk=chunk, message=f"Unsupported file type for Ollama: {chunk.mimetype}")
+
                 case AIChunkToolCall():
                     tool_calls.append(
                         Message.ToolCall(
@@ -47,7 +50,7 @@ class OllamaAdapter(BaseAdapter):
                     )
 
                 case _:
-                    raise ValueError(f"Unsupported chunk type: {type(chunk)}")
+                    raise UnsupportedChunk(chunk=chunk)
 
         return text, images, tool_calls
 

@@ -22,7 +22,7 @@ from openai.types.shared_params.function_definition import FunctionDefinition
 from ..messages import AIMessages, AIMessageToolResponse, AIRoles
 from ..chunks import AIChunkText, AIChunkImageURL, AIChunkFile, AIChunkToolCall
 from ..tools import AITool
-from .base import BaseAdapter
+from .base import BaseAdapter, UnsupportedChunk
 
 
 class OpenAIAdapter(BaseAdapter):
@@ -56,9 +56,9 @@ class OpenAIAdapter(BaseAdapter):
                                         content=[cls.content_chunk(chunk)]
                                     ))
                                 else:
-                                    raise ValueError(f"Unsupported file type in system message: {chunk.mimetype}")
+                                    raise UnsupportedChunk(chunk=chunk, message=f"Unsupported file type in system message: {chunk.mimetype}")
                             case _:
-                                raise ValueError(f"Unsupported chunk type in system message: {type(chunk)}")
+                                raise UnsupportedChunk(chunk=chunk, message=f"Unsupported chunk type in system message: {chunk.type}")
                             
                     result.append(ChatCompletionSystemMessageParam(
                         role=message.role.value,
@@ -73,7 +73,7 @@ class OpenAIAdapter(BaseAdapter):
                             case AIChunkText() | AIChunkImageURL() | AIChunkFile():
                                 formatted_content_chunks.append(cls.content_chunk(chunk))
                             case _:
-                                raise ValueError(f"Unsupported chunk type in user message: {type(chunk)}")
+                                raise UnsupportedChunk(chunk=chunk, message=f"Unsupported chunk type in user message: {type(chunk)}")
                             
                     result.append(ChatCompletionUserMessageParam(
                         role=message.role.value,
@@ -99,9 +99,9 @@ class OpenAIAdapter(BaseAdapter):
                                         content=[cls.content_chunk(chunk)]
                                     ))
                                 else:
-                                    raise ValueError(f"Unsupported file type in model message: {chunk.mimetype}")
+                                    raise UnsupportedChunk(chunk=chunk, message=f"Unsupported file type in model message: {chunk.mimetype}")
                             case _:
-                                raise ValueError(f"Unsupported chunk type in model message: {type(chunk)}")
+                                raise UnsupportedChunk(chunk=chunk, message=f"Unsupported chunk type in model message: {chunk.type}")
                             
                     result.append(ChatCompletionAssistantMessageParam(
                         role=message.role.value,
@@ -127,9 +127,9 @@ class OpenAIAdapter(BaseAdapter):
                                         content=[cls.content_chunk(chunk)]
                                     ))
                                 else:
-                                    raise ValueError(f"Unsupported file type in tool message: {chunk.mimetype}")
+                                    raise UnsupportedChunk(chunk=chunk, message=f"Unsupported file type in tool message: {chunk.mimetype}")
                             case _:
-                                raise ValueError(f"Unsupported chunk type in tool message: {type(chunk)}")
+                                raise UnsupportedChunk(chunk=chunk, message=f"Unsupported chunk type in tool message: {type(chunk)}")
                             
                     result.append(ChatCompletionToolMessageParam(
                         role=message.role.value,
@@ -163,9 +163,9 @@ class OpenAIAdapter(BaseAdapter):
                             name=chunk.name
                         )
                     )
-                raise ValueError(f"Unsupported file type for OpenAI: {chunk.mimetype}")
+                raise UnsupportedChunk(chunk=chunk, message=f"Unsupported file type for OpenAI: {chunk.mimetype}")
             case _:
-                raise ValueError(f"Unsupported chunk type: {type(chunk)}")
+                raise ValueError(f"Unexpected chunk type: {chunk}")
             
     @classmethod
     def text_chunk(cls, chunk: AIChunkText) -> ChatCompletionContentPartTextParam:
