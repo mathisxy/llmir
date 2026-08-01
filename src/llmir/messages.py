@@ -1,7 +1,7 @@
 from __future__ import annotations
 from pydantic import BaseModel, Field
 from typing import Literal
-from .chunks import AIChunks, AIChunkText
+from .chunks import AIChunkFile, AIChunkImageURL, AIChunkToolCall, AIChunks, AIChunkText
 from .roles import AIRoles
 
 class AIMessage(BaseModel):
@@ -13,18 +13,29 @@ class AIMessage(BaseModel):
         chunks: The content chunks.
     """
 
+    Roles = AIRoles
+
+    class Chunk:
+        Text = AIChunkText
+        File = AIChunkFile
+        ImageURL = AIChunkImageURL
+        ToolCall = AIChunkToolCall
+
+        Any = AIChunks
+
     role: Literal[AIRoles.USER, AIRoles.MODEL, AIRoles.SYSTEM]
-    chunks: list[AIChunks] = Field(default_factory=list[AIChunks])
+    chunks: list[Chunk.Any] = Field(default_factory=list["Chunk.Any"])
+
 
     @classmethod
     def text(cls,
         text: str,
-        role: Literal[AIRoles.USER, AIRoles.MODEL, AIRoles.SYSTEM],
+        role: Literal[Roles.USER, Roles.MODEL, Roles.SYSTEM],
     ) -> AIMessage:
         return AIMessage(
             role=role,
             chunks=[
-                AIChunkText(text=text)
+                cls.Chunk.Text(text=text)
             ]
         )
         
