@@ -13,6 +13,9 @@ class AIMessage(BaseModel):
         chunks: The content chunks.
     """
 
+    role: Literal[AIRoles.USER, AIRoles.MODEL, AIRoles.SYSTEM]
+    chunks: list[AIChunks] = Field(default_factory=list[AIChunks])
+
     Roles = AIRoles
 
     class Chunk:
@@ -23,19 +26,16 @@ class AIMessage(BaseModel):
 
         Any = AIChunks
 
-    role: Literal[AIRoles.USER, AIRoles.MODEL, AIRoles.SYSTEM]
-    chunks: list[Chunk.Any] = Field(default_factory=list["Chunk.Any"])
-
 
     @classmethod
     def text(cls,
         text: str,
-        role: Literal[Roles.USER, Roles.MODEL, Roles.SYSTEM],
+        role: Literal[AIRoles.USER, AIRoles.MODEL, AIRoles.SYSTEM],
     ) -> AIMessage:
         return AIMessage(
             role=role,
             chunks=[
-                cls.Chunk.Text(text=text)
+                AIChunkText(text=text)
             ]
         )
         
@@ -50,6 +50,16 @@ class AIMessageToolResponse(BaseModel):
         id: The id of the tool.
         name: The name of the tool.
     """
+
+    Roles = AIRoles
+
+    class Chunk:
+        Text = AIChunkText
+        File = AIChunkFile
+        ImageURL = AIChunkImageURL
+        ToolCall = AIChunkToolCall
+
+        Any = AIChunks
 
     role: Literal[AIRoles.TOOL] = AIRoles.TOOL
     chunks: list[AIChunks] = Field(default_factory=list[AIChunks])
