@@ -1,6 +1,6 @@
 from __future__ import annotations
 from pydantic import BaseModel, Field
-from typing import Literal
+from typing import ClassVar, Literal
 from .chunks import AIChunkFile, AIChunkImageURL, AIChunkToolCall, AIChunks, AIChunkText
 from .roles import AIRoles
 
@@ -16,15 +16,15 @@ class AIMessage(BaseModel):
     role: Literal[AIRoles.USER, AIRoles.MODEL, AIRoles.SYSTEM]
     chunks: list[AIChunks] = Field(default_factory=list[AIChunks])
 
-    Roles = AIRoles
+    Roles: ClassVar = AIRoles
 
     class Chunk:
-        Text = AIChunkText
-        File = AIChunkFile
-        ImageURL = AIChunkImageURL
-        ToolCall = AIChunkToolCall
+        Text: ClassVar = AIChunkText
+        File: ClassVar = AIChunkFile
+        ImageURL: ClassVar = AIChunkImageURL
+        ToolCall: ClassVar = AIChunkToolCall
 
-        Any = AIChunks
+        Any: ClassVar = AIChunks
 
 
     @classmethod
@@ -51,15 +51,15 @@ class AIMessageToolResponse(BaseModel):
         name: The name of the tool.
     """
 
-    Roles = AIRoles
+    Roles: ClassVar = AIRoles
 
     class Chunk:
-        Text = AIChunkText
-        File = AIChunkFile
-        ImageURL = AIChunkImageURL
-        ToolCall = AIChunkToolCall
+        Text: ClassVar = AIChunkText
+        File: ClassVar = AIChunkFile
+        ImageURL: ClassVar = AIChunkImageURL
+        ToolCall: ClassVar = AIChunkToolCall
 
-        Any = AIChunks
+        Any: ClassVar = AIChunks
 
     role: Literal[AIRoles.TOOL] = AIRoles.TOOL
     chunks: list[AIChunks] = Field(default_factory=list[AIChunks])
